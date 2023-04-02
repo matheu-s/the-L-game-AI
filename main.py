@@ -20,23 +20,30 @@ def play():
     # Board generation
     board = Board()
     board.draw_board(screen=SCREEN)
+    board.draw_initial_state(screen=SCREEN)
 
     # Right container data
     BTN_PLAY_BACK = Button(image=None, pos=(WIDTH - 275, 660),
                            text_input="BACK", font=get_font(30), base_color="White", hovering_color="Blue")
     BTN_PLAY_BACK.update(SCREEN)
 
-
+    drag_mouse = False
     while True:
-        POS_MOUSE = pygame.mouse.get_pos()
-
+        MOUSE_POS = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if BTN_PLAY_BACK.checkForInput(POS_MOUSE):
+                drag_mouse = True
+                if BTN_PLAY_BACK.checkForInput(MOUSE_POS):
                     main_menu()
+            if event.type == pygame.MOUSEBUTTONUP:
+                drag_mouse = False
+            if drag_mouse:
+                board.check_input(MOUSE_POS)
+
+
 
         pygame.display.update()
 
