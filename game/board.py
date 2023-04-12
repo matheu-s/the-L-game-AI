@@ -16,14 +16,39 @@ class Board:
                         }
         self.selected_squares_L1_red = []
         self.selected_squares_L2_blue = []
-        self.selected_squares_coin_1 = []
-        self.selected_squares_coin_2 = []
+        self.selected_squares_coin_1 = None
+        self.selected_squares_coin_2 = None
         self.temp_squares = []
 
     def check_input(self, pos, screen):
         if self.check_turn():
+            # Getting data on click
+            clicked_key = self.get_key_clicked_square(pos)
+            sqr = self.squares.get(clicked_key)
+
+            # Checking if coin was the one clicked
+            if clicked_key == self.selected_squares_coin_1:
+                self.paint_square(screen, sqr, GREEN)
+                self.selected_squares_coin_1 = None
+                return
+            if clicked_key == self.selected_squares_coin_2:
+                self.paint_square(screen, sqr, GREEN)
+                self.selected_squares_coin_2 = None
+                return
+
+            # Checking if the click is to place a new coin
+            if not self.selected_squares_coin_1:
+                coin = Coin(sqr)
+                coin.draw(screen)
+                self.selected_squares_coin_1 = clicked_key
+                return
+            if not self.selected_squares_coin_2:
+                coin = Coin(sqr)
+                coin.draw(screen)
+                self.selected_squares_coin_2 = clicked_key
+                return
+
             # Painting the clicked with temporary red
-            sqr = self.squares.get(self.get_clicked_square(pos))
             self.paint_square(screen, sqr, LIGHT_RED)
             self.temp_squares.append(sqr)
 
@@ -38,9 +63,9 @@ class Board:
                 l_piece = L(RED)
                 l_piece.draw(screen, self.selected_squares_L1_red)
 
-                #create an engine class and engine.update(11, 12, .. selected)
+                # create an engine class and engine.update(11, 12, .. selected)
 
-    def get_clicked_square(self, pos):
+    def get_key_clicked_square(self, pos):
         for key in self.squares.keys():
             sqr_pos = self.squares.get(key)
             if sqr_pos.collidepoint(pos):
