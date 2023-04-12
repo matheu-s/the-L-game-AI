@@ -16,4 +16,3 @@ class L:
                 pygame.draw.rect(screen, (0, 0, 0), (x - i, y - i, x_size - 1, y_size - 1), 1)
 
 
-

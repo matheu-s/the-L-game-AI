@@ -16,7 +16,9 @@ GREY = (136, 153, 166)
 BLACK = (1, 1, 1)
 YELLOW = (243, 199, 13)
 RED = (255, 0, 0)
+LIGHT_RED = (255, 109, 106)
 BLUE = (0, 0, 255)
+LIGHT_BLUE = (173, 216, 230)
 
 # Players ref
 LPHANT = 1
