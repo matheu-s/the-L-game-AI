@@ -9,7 +9,8 @@ pygame.init()
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("L game")
 BG = pygame.image.load("assets/images/background.png")
-
+# by default is 1, change on to 2 in options
+HUMAN_TURN = 1
 
 def get_font(size):
     return pygame.font.Font("assets/fonts/menu.otf", size)
@@ -18,25 +19,32 @@ def get_font(size):
 def play():
     SCREEN.fill(GREY)
     # Board generation
-    board = Board()
+    board = Board(HUMAN_TURN)
     board.draw_board(screen=SCREEN)
+    board.draw_initial_state(screen=SCREEN)
+    board.start()
 
     # Right container data
     BTN_PLAY_BACK = Button(image=None, pos=(WIDTH - 275, 660),
                            text_input="BACK", font=get_font(30), base_color="White", hovering_color="Blue")
     BTN_PLAY_BACK.update(SCREEN)
 
-
+    drag_mouse = False
     while True:
-        POS_MOUSE = pygame.mouse.get_pos()
-
+        MOUSE_POS = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if BTN_PLAY_BACK.checkForInput(POS_MOUSE):
+                if BTN_PLAY_BACK.checkForInput(MOUSE_POS):
                     main_menu()
+                board.check_input(MOUSE_POS, SCREEN)
+
+            # if event.type == pygame.MOUSEBUTTONUP:
+            #     drag_mouse = False
+            # if drag_mouse:
+            #     board.check_input(MOUSE_POS)
 
         pygame.display.update()
 
