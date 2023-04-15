@@ -1,16 +1,29 @@
 from config.constants import ROWS, COLS
+from engine.helper.node import Node
+from typing import Optional, Dict, List
+
+
+def nice_print(state):
+    s = [[str(e) for e in row] for row in state]
+    lens = [max(map(len, col)) for col in zip(*s)]
+    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
+    table = [fmt.format(*row) for row in s]
+    print('\n'.join(table))
+    print('----------------------------------')
 
 
 class Data:
     def __init__(self):
-        self.matrix_squares_availability = [
+        self.matrix_squares_state = [
             [0, 0, 0, 0],
             [0, 0, 0, 0],
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ]
+        self.root = None  # It's set after state is set too on set_state()
+        self.nodes_count = 0
 
-    def set_availability(self, data):
+    def set_state(self, data):
         """Update local matrix to make data handling easier"""
 
         index_offset = 1
@@ -20,10 +33,27 @@ class Data:
             col = int(col) - index_offset
             piece = data.get(key)
             if piece:
-                self.matrix_squares_availability[row][col] = piece
+                self.matrix_squares_state[row][col] = piece
             else:
-                self.matrix_squares_availability[row][col] = 1
+                self.matrix_squares_state[row][col] = 1
+        # Setting the root
+        self.root = Node(self.matrix_squares_state, None)
+        nice_print(self.root.state)
 
-    def get_L_fit(self):
-        """Get places where L fits"""
-        print('getting L...')
+    def generate_game_tree(self):
+        self.__expand(self.root)
+
+    def __expand(self, root: Node):
+        stack = []
+        root.expand()
+
+        for desc in root.descendants:
+            stack.append(desc)
+
+        # Removed recursion due to stack overflow errors...
+        while len(stack):
+            node = stack.pop()
+            node.expand()
+            self.nodes_count += 1
+            for desc in node.descendants:
+                stack.insert(0, desc)

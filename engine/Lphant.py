@@ -20,9 +20,10 @@ class Lphant:
                 self.squares_data.update({key: 1})
 
     def play(self):
-        moves = self.generate_possible_moves()
-        print(moves)
+        tree = self.generate_game_tree()
+        print('generating tree')
 
-    def generate_possible_moves(self):
-        self.data_helper.set_availability(self.squares_data)
+    def generate_game_tree(self):
+        self.data_helper.set_state(self.squares_data)
+        self.data_helper.generate_game_tree()
         return 'generating...'
