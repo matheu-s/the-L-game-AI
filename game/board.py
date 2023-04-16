@@ -3,22 +3,26 @@ import pygame, time
 from config.constants import *
 from game.pieces.coin import Coin
 from game.pieces.L import L
+from engine.Lphant import Lphant
 
 
 class Board:
     def __init__(self, human_player_is):
         self.human_player_is = human_player_is
+        self.engine = Lphant()
         self.turn = 1
-        self.squares = {'1,1': None, '1,2': None, '1,3': None, '1,4': None,
-                        '2,1': None, '2,2': None, '2,3': None, '2,4': None,
-                        '3,1': None, '3,2': None, '3,3': None, '3,4': None,
-                        '4,1': None, '4,2': None, '4,3': None, '4,4': None,
-                        }
-        self.selected_squares_L1_red = []
-        self.selected_squares_L2_blue = []
-        self.selected_squares_coin_1 = None
-        self.selected_squares_coin_2 = None
+        self.keys_L1_red = []
+        self.keys_L2_blue = []
+        self.key_coin_1 = ''
+        self.key_coin_2 = ''
         self.temp_squares = []
+        self.temp_keys = []
+        self.squares = {
+            '1,1': pygame.rect, '1,2': pygame.rect, '1,3': pygame.rect, '1,4': pygame.rect,
+            '2,1': pygame.rect, '2,2': pygame.rect, '2,3': pygame.rect, '2,4': pygame.rect,
+            '3,1': pygame.rect, '3,2': pygame.rect, '3,3': pygame.rect, '3,4': pygame.rect,
+            '4,1': pygame.rect, '4,2': pygame.rect, '4,3': pygame.rect, '4,4': pygame.rect,
+        }
 
     def check_input(self, pos, screen):
         if self.check_turn():
@@ -27,43 +31,55 @@ class Board:
             sqr = self.squares.get(clicked_key)
 
             # Checking if coin was the one clicked
-            if clicked_key == self.selected_squares_coin_1:
+            if clicked_key == self.key_coin_1:
                 self.paint_square(screen, sqr, GREEN)
-                self.selected_squares_coin_1 = None
+                self.key_coin_1 = None
                 return
-            if clicked_key == self.selected_squares_coin_2:
+            if clicked_key == self.key_coin_2:
                 self.paint_square(screen, sqr, GREEN)
-                self.selected_squares_coin_2 = None
+                self.key_coin_2 = None
                 return
 
             # Checking if the click is to place a new coin
-            if not self.selected_squares_coin_1:
+            if not self.key_coin_1:
                 coin = Coin(sqr)
                 coin.draw(screen)
-                self.selected_squares_coin_1 = clicked_key
+                self.key_coin_1 = clicked_key
+                # Changing to bot move after coin is placed
+                self.turn = 2
                 return
-            if not self.selected_squares_coin_2:
+            if not self.key_coin_2:
                 coin = Coin(sqr)
                 coin.draw(screen)
-                self.selected_squares_coin_2 = clicked_key
+                self.key_coin_2 = clicked_key
+                # Changing to bot move after coin is placed
+                self.turn = 2
                 return
 
             # Painting the clicked with temporary red
             self.paint_square(screen, sqr, LIGHT_RED)
             self.temp_squares.append(sqr)
+            self.temp_keys.append(clicked_key)
 
             # When 4 selected, form the new L
             if len(self.temp_squares) == 4:
-                for rec in self.selected_squares_L1_red:
-                    self.paint_square(screen, rec, GREEN)
+                # Resetting previous L
+                for keys in self.keys_L1_red:
+                    self.paint_square(screen, self.squares.get(keys), GREEN)
 
                 # Resetting temp and updating selected L position
-                self.selected_squares_L1_red = self.temp_squares
-                self.temp_squares = []
                 l_piece = L(RED)
-                l_piece.draw(screen, self.selected_squares_L1_red)
+                l_piece.draw(screen, self.temp_squares)
+                self.temp_squares = []
+                self.keys_L1_red = self.temp_keys
 
-                # create an engine class and engine.update(11, 12, .. selected)
+        else:
+            data = self.generate_data()
+            self.engine.update_squares(data)
+            new_board_state = self.engine.play()
+            self.update_board(new_board_state, screen)
+            time.sleep(1)
+            self.turn = self.human_player_is
 
     def get_key_clicked_square(self, pos):
         for key in self.squares.keys():
@@ -83,30 +99,88 @@ class Board:
         for i in range(4):
             pygame.draw.rect(screen, (0, 0, 0), (a - i, b - i, c - 1, d - 1), 1)
 
+    def generate_data(self):
+        """Gather all pieces positions and create dict as square: piece"""
+
+        data = {}
+
+        for L_red in self.keys_L1_red:
+            data.update({L_red: 'L1'})
+        for L_blue in self.keys_L2_blue:
+            data.update({L_blue: 'L2'})
+        data.update({self.key_coin_1: 'C1'})
+        data.update({self.key_coin_2: 'C2'})
+
+        return data
+
+    def update_board(self, dict_state, screen):
+        """Updates all board keys and draws pieces after computer moves"""
+
+        self.keys_L1_red = []
+        self.keys_L2_blue = []
+        self.key_coin_1 = ''
+        self.key_coin_2 = ''
+        self.temp_squares = []
+        self.temp_keys = []
+
+        # Painting all to green
+        for rect in self.squares.values():
+            self.paint_square(screen, rect, GREEN)
+
+        # Updating all pieces keys
+        for key in dict_state:
+            if dict_state[key] == 'L1':
+                self.keys_L1_red.append(key)
+            elif dict_state[key] == 'L2':
+                self.keys_L2_blue.append(key)
+            elif dict_state[key] == 'C1':
+                self.key_coin_1 = key
+            elif dict_state[key] == 'C2':
+                self.key_coin_2 = key
+
+        # Painting pieces on the board again
+        for key in self.keys_L1_red:
+            self.temp_squares.append(self.squares.get(key))
+        l_piece = L(RED)
+        l_piece.draw(screen, self.temp_squares)
+        self.temp_squares = []
+
+        for key in self.keys_L2_blue:
+            self.temp_squares.append(self.squares.get(key))
+        l_piece2 = L(BLUE)
+        l_piece2.draw(screen, self.temp_squares)
+        self.temp_squares = []
+
+        coin1 = Coin(self.squares[self.key_coin_1])
+        coin1.draw(screen)
+
+        coin2 = Coin(self.squares[self.key_coin_2])
+        coin2.draw(screen)
+
     def draw_initial_state(self, screen):
         # Drawing coins
         pos1 = self.squares.get('1,1')
         coin1 = Coin(pos1)
         coin1.draw(screen)
-        self.selected_squares_coin_1 = '1,1'
+        self.key_coin_1 = '1,1'
 
         pos2 = self.squares.get('4,4')
         coin2 = Coin(pos2)
         coin2.draw(screen)
-        self.selected_squares_coin_2 = '4,4'
+        self.key_coin_2 = '4,4'
 
         # Drawing L's
         L_RED = L(RED)
         initial_squares_L1 = [self.squares.get('1,2'), self.squares.get('1,3'), self.squares.get('2,3'),
                               self.squares.get('3,3')]
         L_RED.draw(screen, initial_squares_L1)
-        self.selected_squares_L1_red = initial_squares_L1
+        self.keys_L1_red = ['1,2', '1,3', '2,3', '3,3']
 
         L_BLUE = L(BLUE)
         initial_squares_L2 = [self.squares.get('2,2'), self.squares.get('3,2'), self.squares.get('4,2'),
                               self.squares.get('4,3')]
         L_BLUE.draw(screen, initial_squares_L2)
-        self.selected_squares_L2_blue = initial_squares_L2
+        self.keys_L2_blue = ['2,2', '3,2', '4,2', '4,3']
 
     def draw_board(self, screen):
         board_rect = pygame.draw.rect(screen, (240, 240, 240), (20, 40, PLAY_SCREEN_WIDTH, PLAY_SCREEN_HEIGHT))
@@ -137,7 +211,7 @@ class Board:
         # pygame.display.update()
 
     def start(self):
-        if (self.human_player_is == 2):
+        if self.human_player_is == 2:
             time.sleep(2)
             print('computer moves..')
         else:
