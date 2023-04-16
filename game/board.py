@@ -76,7 +76,8 @@ class Board:
         else:
             data = self.generate_data()
             self.engine.update_squares(data)
-            self.engine.play()
+            new_board_state = self.engine.play()
+            self.update_board(new_board_state, screen)
             time.sleep(1)
             self.turn = self.human_player_is
 
@@ -111,6 +112,50 @@ class Board:
         data.update({self.key_coin_2: 'C2'})
 
         return data
+
+    def update_board(self, dict_state, screen):
+        """Updates all board keys and draws pieces after computer moves"""
+
+        self.keys_L1_red = []
+        self.keys_L2_blue = []
+        self.key_coin_1 = ''
+        self.key_coin_2 = ''
+        self.temp_squares = []
+        self.temp_keys = []
+
+        # Painting all to green
+        for rect in self.squares.values():
+            self.paint_square(screen, rect, GREEN)
+
+        # Updating all pieces keys
+        for key in dict_state:
+            if dict_state[key] == 'L1':
+                self.keys_L1_red.append(key)
+            elif dict_state[key] == 'L2':
+                self.keys_L2_blue.append(key)
+            elif dict_state[key] == 'C1':
+                self.key_coin_1 = key
+            elif dict_state[key] == 'C2':
+                self.key_coin_2 = key
+
+        # Painting pieces on the board again
+        for key in self.keys_L1_red:
+            self.temp_squares.append(self.squares.get(key))
+        l_piece = L(RED)
+        l_piece.draw(screen, self.temp_squares)
+        self.temp_squares = []
+
+        for key in self.keys_L2_blue:
+            self.temp_squares.append(self.squares.get(key))
+        l_piece2 = L(BLUE)
+        l_piece2.draw(screen, self.temp_squares)
+        self.temp_squares = []
+
+        coin1 = Coin(self.squares[self.key_coin_1])
+        coin1.draw(screen)
+
+        coin2 = Coin(self.squares[self.key_coin_2])
+        coin2.draw(screen)
 
     def draw_initial_state(self, screen):
         # Drawing coins

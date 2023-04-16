@@ -56,4 +56,22 @@ class Data:
             node.expand()
             self.nodes_count += 1
             for desc in node.descendants:
-                stack.insert(0, desc)
+                # stack.insert(0, desc)
+                stack.append(desc)
+            # if self.nodes_count > 100:
+            #     child1 = self.root.descendant[0]
+            #     test family tree
+            #     print()
+        print('Finished moves generation')
+
+    def find_the_best_move(self, start_node=None):
+        if not start_node:
+            start_node = self.root
+        chosen_move = start_node.descendants[3].state
+        nice_print(chosen_move)
+        return chosen_move
+        #logic here or in Lphant? handling the minimax... maybe later
+        # for desc in start_node.descendants:
+
+
+

@@ -1,4 +1,5 @@
 from config.constants import ROWS, COLS
+from engine.helper.evaluator import Evaluator
 from copy import deepcopy
 
 
@@ -23,10 +24,11 @@ def clean_piece(state, piece):
 
 
 class Node:
-    def __init__(self, state, ancestor=None):
+    def __init__(self, state, ancestor=None, evaluation=0):
         self.state = state
         self.descendants = []
         self.ancestor = ancestor
+        self.evaluation = evaluation
         self.is_terminal = False
         if ancestor:
             self.generation = ancestor.generation + 1
@@ -47,11 +49,12 @@ class Node:
         # Get all moves (include coin moves now)
         possible_moves = self.get_coin_moves(L_moves)
         print('L moves: ', len(L_moves))
-        print('Total moves: ', len(possible_moves))
-        for i in possible_moves:
+        evaluator_obj = Evaluator()
+        for move in possible_moves:
             # print('Child: ')
             # nice_print(i)
-            self.descendants.append(Node(i, self))
+            evaluation = evaluator_obj.get_score(move)
+            self.descendants.append(Node(move, self, evaluation))
 
     def get_L_moves(self, state):
         """Get all L moves"""
