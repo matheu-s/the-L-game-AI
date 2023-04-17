@@ -1,4 +1,5 @@
 from engine.helper.data import Data
+from engine.helper.minimax import Minimax
 from config.constants import ROWS, COLS
 
 
@@ -26,15 +27,24 @@ class Lphant:
         """Start the process of finding the best move and return new board state"""
 
         move = self.get_the_best_move()
-        print(move)
+        if not move:
+            return
         board_dict = self.transform_matrix_to_board(move)
         return board_dict
 
     def get_the_best_move(self):
+        # Generating game tree, depth 2-3
         self.data_helper.set_state(self.squares_data)
         self.data_helper.generate_game_tree()
-        move = self.data_helper.find_the_best_move()
-        return move
+
+        minimax = Minimax(self.data_helper.root)
+        move2 = minimax.get_the_best_move()
+
+        return move2
+
+        # temp
+        # move = self.data_helper.find_the_best_move()
+        # return move
 
     def transform_matrix_to_board(self, matrix):
         dict_board = {}

@@ -24,12 +24,11 @@ def play():
     board.draw_initial_state(screen=SCREEN)
     board.start()
 
-    # Right container data
+    # Container on the right, with Back button
     BTN_PLAY_BACK = Button(image=None, pos=(WIDTH - 275, 660),
                            text_input="BACK", font=get_font(30), base_color="White", hovering_color="Blue")
     BTN_PLAY_BACK.update(SCREEN)
 
-    drag_mouse = False
     while True:
         MOUSE_POS = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -40,12 +39,6 @@ def play():
                 if BTN_PLAY_BACK.checkForInput(MOUSE_POS):
                     main_menu()
                 board.check_input(MOUSE_POS, SCREEN)
-
-            # if event.type == pygame.MOUSEBUTTONUP:
-            #     drag_mouse = False
-            # if drag_mouse:
-            #     board.check_input(MOUSE_POS)
-
         pygame.display.update()
 
 
