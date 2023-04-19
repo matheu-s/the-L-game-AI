@@ -46,14 +46,16 @@ class Board:
                 coin.draw(screen)
                 self.key_coin_1 = clicked_key
                 # Changing to bot move after coin is placed
-                self.turn = 2
+                turn = 1 if self.human_player_is % 2 == 0 else 2
+                self.turn = turn
                 return
             if not self.key_coin_2:
                 coin = Coin(sqr)
                 coin.draw(screen)
                 self.key_coin_2 = clicked_key
                 # Changing to bot move after coin is placed
-                self.turn = 2
+                turn = 1 if self.human_player_is % 2 == 0 else 2
+                self.turn = turn
                 return
 
             # Painting the clicked with temporary red
@@ -76,7 +78,13 @@ class Board:
         else:
             data = self.generate_data()
             self.engine.update_squares(data)
-            new_board_state = self.engine.play()
+            try:
+                new_board_state = self.engine.play()
+            except GeneratorExit as e:
+                print('bot lost')
+                if e == 'LOSS':
+                    print('bot lost')
+                return False
             self.update_board(new_board_state, screen)
             time.sleep(1)
             self.turn = self.human_player_is
@@ -124,8 +132,7 @@ class Board:
         self.temp_keys = []
 
         # Painting all to green
-        for rect in self.squares.values():
-            self.paint_square(screen, rect, GREEN)
+        self.draw_board(screen)
 
         # Updating all pieces keys
         for key in dict_state:

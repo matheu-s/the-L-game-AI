@@ -1,3 +1,4 @@
+import game.board
 from config.constants import ROWS, COLS
 from engine.helper.node import Node
 from typing import Optional, Dict, List
@@ -37,7 +38,7 @@ class Data:
             else:
                 self.matrix_squares_state[row][col] = 1
         # Setting the root
-        self.root = Node(self.matrix_squares_state, None)
+        self.root = Node(self.matrix_squares_state, None, 0, 'L2')
         nice_print(self.root.state)
 
     def generate_game_tree(self):
@@ -67,8 +68,25 @@ class Data:
     def find_the_best_move(self, start_node=None):
         if not start_node:
             start_node = self.root
+
+        print('first generation: ')
+        print('gen: ', start_node.descendants[3].generation)
+        print('eval: ', start_node.descendants[3].evaluation)
         chosen_move = start_node.descendants[3].state
         nice_print(chosen_move)
+
+        print('second gen: ')
+        print('gen: ', start_node.descendants[3].descendants[0].generation)
+        print('eval2: ', start_node.descendants[3].descendants[0].evaluation)
+        chosen_move2 = start_node.descendants[3].descendants[0].state
+        nice_print(chosen_move2)
+
+        # print('third gen: ')
+        # print('gen: ',  start_node.descendants[3].descendants[0].generation)
+        # print('eval3: ', start_node.descendants[3].descendants[0].descendants[0].evaluation)
+        # chosen_move3 = start_node.descendants[3].descendants[0].descendants[0].state
+        # nice_print(chosen_move3)
+
         return chosen_move
         #logic here or in Lphant? handling the minimax... maybe later
         # for desc in start_node.descendants:

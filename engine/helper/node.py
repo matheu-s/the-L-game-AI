@@ -1,4 +1,4 @@
-from config.constants import ROWS, COLS
+from config.constants import ROWS, COLS, DEPTH
 from engine.helper.evaluator import Evaluator
 from copy import deepcopy
 
@@ -24,7 +24,7 @@ def clean_piece(state, piece):
 
 
 class Node:
-    def __init__(self, state, ancestor=None, evaluation=0):
+    def __init__(self, state, ancestor=None, evaluation=0, player=None):
         self.state = state
         self.descendants = []
         self.ancestor = ancestor
@@ -32,23 +32,37 @@ class Node:
         self.is_terminal = False
         if ancestor:
             self.generation = ancestor.generation + 1
+            self.player = 'L2' if self.ancestor.player == 'L1' else 'L1'
         else:
             self.generation = 0
+            self.player = player
 
     def expand(self):
         if self.is_terminal:
             return
-        # Depth reached
-        if self.generation == 2:
+
+        # Remove its own piece from board
+        piece = self.player
+        state = clean_piece(self.state, piece)
+
+        # Generates possible L moves
+        L_moves = self.get_L_moves(state, piece)
+        if len(L_moves) == 0 and self.player == 'L2':
+            self.is_terminal = True
+            self.evaluation = -10
+            return
+        if len(L_moves) == 0 and self.player == 'L1':
+            self.is_terminal = True
+            self.evaluation = 10
             return
 
-            # Remove its own piece from board
-        state = clean_piece(self.state, 'L2')
-        # Generates possible L moves
-        L_moves = self.get_L_moves(state)
+        # Depth reached
+        if self.generation == DEPTH:
+            self.is_terminal = True
+            return
+
         # Get all moves (include coin moves now)
         possible_moves = self.get_coin_moves(L_moves)
-        print('L moves: ', len(L_moves))
         evaluator_obj = Evaluator()
         for move in possible_moves:
             # print('Child: ')
@@ -56,7 +70,7 @@ class Node:
             evaluation = evaluator_obj.get_score(move)
             self.descendants.append(Node(move, self, evaluation))
 
-    def get_L_moves(self, state):
+    def get_L_moves(self, state, l_piece):
         """Get all L moves"""
 
         # print('trying to find smt on this state: ')
@@ -90,10 +104,10 @@ class Node:
                     # if there is a 0 and is adjacent to head/tail
                     if state[row_counter + 1][j] == 1 and (j == i1 or j == i3):
                         found = deepcopy(state)
-                        found[row_counter][i1] = 'L2'
-                        found[row_counter][i2] = 'L2'
-                        found[row_counter][i3] = 'L2'
-                        found[row_counter + 1][int(j)] = 'L2'
+                        found[row_counter][i1] = l_piece
+                        found[row_counter][i2] = l_piece
+                        found[row_counter][i3] = l_piece
+                        found[row_counter + 1][int(j)] = l_piece
                         # Adding new L move if it's diff from original
                         if self.check_state_diff(found):
                             possible_L.append(found)
@@ -103,10 +117,10 @@ class Node:
                     # if there is a 0 and is adjacent to head/tail
                     if state[row_counter - 1][j] == 1 and (j == i1 or j == i3):
                         found = deepcopy(state)
-                        found[row_counter][i1] = 'L2'
-                        found[row_counter][i2] = 'L2'
-                        found[row_counter][i3] = 'L2'
-                        found[row_counter - 1][int(j)] = 'L2'
+                        found[row_counter][i1] = l_piece
+                        found[row_counter][i2] = l_piece
+                        found[row_counter][i3] = l_piece
+                        found[row_counter - 1][int(j)] = l_piece
                         if self.check_state_diff(found):
                             possible_L.append(found)
 
@@ -119,10 +133,10 @@ class Node:
                     # if there is a 0 and is adjacent to head/tail
                     if state[j][col_counter + 1] == 1 and (j == i1 or j == i3):
                         found = deepcopy(state)
-                        found[i1][col_counter] = 'L2'
-                        found[i2][col_counter] = 'L2'
-                        found[i3][col_counter] = 'L2'
-                        found[int(j)][col_counter + 1] = 'L2'
+                        found[i1][col_counter] = l_piece
+                        found[i2][col_counter] = l_piece
+                        found[i3][col_counter] = l_piece
+                        found[int(j)][col_counter + 1] = l_piece
                         if self.check_state_diff(found):
                             possible_L.append(found)
 
@@ -132,10 +146,10 @@ class Node:
                     # if there is a 0 and is adjacent to head/tail
                     if state[j][col_counter - 1] == 1 and (j == i1 or j == i3):
                         found = deepcopy(state)
-                        found[i1][col_counter] = 'L2'
-                        found[i2][col_counter] = 'L2'
-                        found[i3][col_counter] = 'L2'
-                        found[int(j)][col_counter - 1] = 'L2'
+                        found[i1][col_counter] = l_piece
+                        found[i2][col_counter] = l_piece
+                        found[i3][col_counter] = l_piece
+                        found[int(j)][col_counter - 1] = l_piece
                         if self.check_state_diff(found):
                             possible_L.append(found)
 
