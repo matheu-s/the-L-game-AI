@@ -10,7 +10,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("L game")
 BG = pygame.image.load("assets/images/background.png")
 # by default is 1, change on to 2 in options
-HUMAN_TURN = 1
+HUMAN_TURN = 2
 
 def get_font(size):
     return pygame.font.Font("assets/fonts/menu.otf", size)

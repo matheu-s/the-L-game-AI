@@ -1,4 +1,4 @@
-from config.constants import ROWS, COLS
+from config.constants import ROWS, COLS, DEPTH
 from engine.helper.evaluator import Evaluator
 from copy import deepcopy
 
@@ -40,9 +40,6 @@ class Node:
     def expand(self):
         if self.is_terminal:
             return
-        # Depth reached
-        if self.generation == 2:
-            return
 
         # Remove its own piece from board
         piece = self.player
@@ -50,7 +47,17 @@ class Node:
 
         # Generates possible L moves
         L_moves = self.get_L_moves(state, piece)
-        if len(L_moves) == 0:
+        if len(L_moves) == 0 and self.player == 'L2':
+            self.is_terminal = True
+            self.evaluation = -10
+            return
+        if len(L_moves) == 0 and self.player == 'L1':
+            self.is_terminal = True
+            self.evaluation = 10
+            return
+
+        # Depth reached
+        if self.generation == DEPTH:
             self.is_terminal = True
             return
 
@@ -60,7 +67,7 @@ class Node:
         for move in possible_moves:
             # print('Child: ')
             # nice_print(i)
-            evaluation = evaluator_obj.get_score(move, self.player)
+            evaluation = evaluator_obj.get_score(move)
             self.descendants.append(Node(move, self, evaluation))
 
     def get_L_moves(self, state, l_piece):

@@ -7,7 +7,7 @@ SQUARE_SIZE = 165
 PLAY_SCREEN_WIDTH = 720 - 60
 PLAY_SCREEN_HEIGHT = 720 - 60
 
-# Frames per second, running computation
+# Frames per second, pygame execution
 FPS = 60
 
 # Colors
@@ -23,3 +23,6 @@ LIGHT_BLUE = (173, 216, 230)
 # Players ref
 LPHANT = 1
 HUMAN = 0
+
+# Engine depth
+DEPTH = 2

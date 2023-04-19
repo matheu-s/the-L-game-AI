@@ -1,3 +1,18 @@
+from math import inf as Infity
+import sys
+
+sys.setrecursionlimit(20000)
+
+
+def nice_print(state):
+    s = [[str(e) for e in row] for row in state]
+    lens = [max(map(len, col)) for col in zip(*s)]
+    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
+    table = [fmt.format(*row) for row in s]
+    print('\n'.join(table))
+    print('----------------------------------')
+
+
 class Minimax:
     def __init__(self, start_node):
         self.start_node = start_node
@@ -7,19 +22,41 @@ class Minimax:
         if self.start_node.is_terminal:
             raise GeneratorExit('LOSS')
 
-        state = self.maximize(self.start_node)
-
-
+        move, score = self.maximize(self.start_node)
+        if score == 10:
+            print('BOT WIN!')
+        elif score == -10:
+            print('bot can lose in next move')
+        print('with score', score)
+        return move
 
     def maximize(self, node):
-        for descendants in node:
-            if descendants.is_teminal:
-                print('terminal')
+        if node.is_terminal:
+            return [node.state, node.evaluation]
 
+        max_score = -Infity
+        max_state = None
+        for descendant in node.descendants:
+            state, score = self.minimize(descendant)
+            if score > max_score and score != -10:
+                max_score = descendant.evaluation
+                max_state = descendant.state
 
-
-
+        print('all children finished, returning the MAX:')
+        nice_print(max_state)
+        print('max_score ', max_score)
+        return [max_state, max_score]
 
     def minimize(self, node):
-        print('minimizing')
+        if node.is_terminal:
+            return [node.state, node.evaluation]
 
+        min_score = Infity
+        min_state = None
+        for descendant in node.descendants:
+            state, score = self.maximize(descendant)
+            if score < min_score:
+                min_score = descendant.evaluation
+                min_state = descendant.state
+
+        return [min_state, min_score]

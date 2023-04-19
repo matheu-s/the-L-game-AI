@@ -1,3 +1,4 @@
+import game.board
 from config.constants import ROWS, COLS
 from engine.helper.node import Node
 from typing import Optional, Dict, List
