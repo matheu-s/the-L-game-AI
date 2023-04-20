@@ -38,9 +38,9 @@ class Lphant:
         self.data_helper.generate_game_tree()
 
         minimax = Minimax(self.data_helper.root)
-        move2 = minimax.get_the_best_move()
+        move = minimax.get_the_best_move()
 
-        return move2
+        return move
 
         # temp
         # move = self.data_helper.find_the_best_move()

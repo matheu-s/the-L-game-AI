@@ -3,15 +3,6 @@ from engine.helper.evaluator import Evaluator
 from copy import deepcopy
 
 
-def nice_print(state):
-    s = [[str(e) for e in row] for row in state]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    print('\n'.join(table))
-    print('----------------------------------')
-
-
 def clean_piece(state, piece):
     """Removes own piece from board to place it again"""
 
@@ -38,6 +29,8 @@ class Node:
             self.player = player
 
     def expand(self):
+        """Expansion process, generates node descendants"""
+
         if self.is_terminal:
             return
 
@@ -65,19 +58,16 @@ class Node:
         possible_moves = self.get_coin_moves(L_moves)
         evaluator_obj = Evaluator()
         for move in possible_moves:
-            # print('Child: ')
-            # nice_print(i)
             evaluation = evaluator_obj.get_score(move)
             self.descendants.append(Node(move, self, evaluation))
 
     def get_L_moves(self, state, l_piece):
         """Get all L moves"""
 
-        # print('trying to find smt on this state: ')
-        # nice_print(state)
         possible_L = []
         three_zeros_row = []
         three_zeros_col = []
+
         # Check rows with three 0's
         row_counter = 0
         for row in state:

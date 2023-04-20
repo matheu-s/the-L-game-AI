@@ -1,13 +1,13 @@
 import pygame
 
-from config.constants import SQUARE_SIZE
-
 
 class L:
     def __init__(self, color):
         self.color = color
 
     def draw(self, screen, squares):
+        """Draws the L piece according to the 4 passed squares'"""
+
         for i in range(len(squares)):
             x, y, x_size, y_size = squares[i]
             print(x, y)

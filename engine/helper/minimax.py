@@ -4,15 +4,6 @@ import sys
 sys.setrecursionlimit(20000)
 
 
-def nice_print(state):
-    s = [[str(e) for e in row] for row in state]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    print('\n'.join(table))
-    print('----------------------------------')
-
-
 class Minimax:
     def __init__(self, start_node):
         self.start_node = start_node
@@ -25,9 +16,8 @@ class Minimax:
         move, score = self.maximize(self.start_node)
         if score == 10:
             print('BOT WIN!')
-        elif score == -10:
-            print('bot can lose in next move')
-        print('with score', score)
+            raise GeneratorExit('WIN')
+        print('Current state score: ', score)
         return move
 
     def maximize(self, node):
@@ -42,9 +32,6 @@ class Minimax:
                 max_score = descendant.evaluation
                 max_state = descendant.state
 
-        print('all children finished, returning the MAX:')
-        nice_print(max_state)
-        print('max_score ', max_score)
         return [max_state, max_score]
 
     def minimize(self, node):

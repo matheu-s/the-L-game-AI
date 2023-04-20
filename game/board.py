@@ -25,7 +25,9 @@ class Board:
         }
 
     def check_input(self, pos, screen):
-        if self.check_turn():
+        """Called everytime there is an action on Play screen"""
+
+        if self.check_human_turn():
             # Getting data on click
             clicked_key = self.get_key_clicked_square(pos)
             sqr = self.squares.get(clicked_key)
@@ -90,25 +92,31 @@ class Board:
             self.turn = self.human_player_is
 
     def get_key_clicked_square(self, pos):
+        """Returns the key of the clicked square according to the clicked position"""
+
         for key in self.squares.keys():
             sqr_pos = self.squares.get(key)
             if sqr_pos.collidepoint(pos):
                 print('selected square: ', key)
                 return key
 
-    def check_turn(self):
+    def check_human_turn(self):
+        """TRUE -> Human turn, FALSE -> Lphant turn'"""
+
         if self.human_player_is == self.turn:
             return True
         return False
 
     def paint_square(self, screen, rect, color):
+        """Paints 1 passed square"""
+
         a, b, c, d = rect
         pygame.draw.rect(screen, color, (int(a), int(b), int(c), int(d)))
         for i in range(4):
             pygame.draw.rect(screen, (0, 0, 0), (a - i, b - i, c - 1, d - 1), 1)
 
     def generate_data(self):
-        """Gather all pieces positions and create dict as square: piece"""
+        """Gather all pieces positions and creates dict as {square_key: piece_name} -> {'1,1': 'C1'}"""
 
         data = {}
 
@@ -165,6 +173,8 @@ class Board:
         coin2.draw(screen)
 
     def draw_initial_state(self, screen):
+        """Draws the initial state of the game with all pieces on it"""
+
         # Drawing coins
         pos1 = self.squares.get('1,1')
         coin1 = Coin(pos1)
@@ -190,6 +200,8 @@ class Board:
         self.keys_L2_blue = ['2,2', '3,2', '4,2', '4,3']
 
     def draw_board(self, screen):
+        """Draws initial board dimensions and squares"""
+
         board_rect = pygame.draw.rect(screen, (240, 240, 240), (20, 40, PLAY_SCREEN_WIDTH, PLAY_SCREEN_HEIGHT))
         square_size = 165  # 720 - 60 = 660/4 = 165
         start_x = 20
@@ -213,13 +225,3 @@ class Board:
             start_y = 40
             col_y = 1
 
-        print(self.squares)
-
-        # pygame.display.update()
-
-    def start(self):
-        if self.human_player_is == 2:
-            time.sleep(2)
-            print('computer moves..')
-        else:
-            print('wait player move')

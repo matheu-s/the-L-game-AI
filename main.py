@@ -22,7 +22,6 @@ def play():
     board = Board(HUMAN_TURN)
     board.draw_board(screen=SCREEN)
     board.draw_initial_state(screen=SCREEN)
-    board.start()
 
     # Container on the right, with Back button
     BTN_PLAY_BACK = Button(image=None, pos=(WIDTH - 275, 660),
