@@ -50,5 +50,3 @@ class Data:
                 stack.append(desc)
         print('Finished moves generation')
 
-
-

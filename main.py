@@ -9,8 +9,10 @@ pygame.init()
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("L game")
 BG = pygame.image.load("assets/images/background.png")
-# by default is 1, change on to 2 in options
-HUMAN_TURN = 2
+
+# Default is 1, it's possible to change on Menu -> Options
+HUMAN_TURN = 1  # First to move
+
 
 def get_font(size):
     return pygame.font.Font("assets/fonts/menu.otf", size)
@@ -46,13 +48,20 @@ def options():
         MOUSE_POS = pygame.mouse.get_pos()
         SCREEN.fill(GREY)
 
-        BTN_OPTIONS_TEXT = get_font(50).render("This is the OPTIONS screen.", True, "White")
-        BTN_OPTIONS_RECT = BTN_OPTIONS_TEXT.get_rect(center=(640, 260))
-        SCREEN.blit(BTN_OPTIONS_TEXT, BTN_OPTIONS_RECT)
+        BTN_P1 = Button(image=None, pos=(640, 170),
+                        text_input="I want to be Player 1!", font=get_font(60), base_color="White",
+                        hovering_color="Green")
+        BTN_P2 = Button(image=None, pos=(640, 290),
+                        text_input="I want to be Player 2!", font=get_font(60), base_color="White",
+                        hovering_color="Green")
 
-        BTN_OPTIONS_BACK = Button(image=None, pos=(640, 470),
+        BTN_OPTIONS_BACK = Button(image=None, pos=(640, 490),
                                   text_input="BACK", font=get_font(80), base_color="White", hovering_color="Green")
 
+        BTN_P1.changeColor(MOUSE_POS)
+        BTN_P1.update(SCREEN)
+        BTN_P2.changeColor(MOUSE_POS)
+        BTN_P2.update(SCREEN)
         BTN_OPTIONS_BACK.changeColor(MOUSE_POS)
         BTN_OPTIONS_BACK.update(SCREEN)
 
@@ -61,7 +70,14 @@ def options():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                global HUMAN_TURN
                 if BTN_OPTIONS_BACK.checkForInput(MOUSE_POS):
+                    main_menu()
+                if BTN_P1.checkForInput(MOUSE_POS):
+                    HUMAN_TURN = 1
+                    main_menu()
+                if BTN_P2.checkForInput(MOUSE_POS):
+                    HUMAN_TURN = 2
                     main_menu()
 
         pygame.display.update()

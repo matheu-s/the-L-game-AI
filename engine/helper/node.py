@@ -149,7 +149,7 @@ class Node:
         """Get all coin moves for each L move"""
 
         possible_moves = []
-        # Getting coin 1 moves
+        # Getting coin moves
         for move in moves:
             new_c1_cleaned = clean_piece(move, 'C1')
             new_c2_cleaned = clean_piece(move, 'C2')

@@ -16,11 +16,12 @@ class Minimax:
         move, score = self.maximize(self.start_node)
         if score == 10:
             print('BOT WIN!')
-            raise GeneratorExit('WIN')
         print('Current state score: ', score)
-        return move
+        return [move, score]
 
     def maximize(self, node):
+        """Returns the maximized value and its state, recursive calls with minimize()"""
+
         if node.is_terminal:
             return [node.state, node.evaluation]
 
@@ -35,6 +36,8 @@ class Minimax:
         return [max_state, max_score]
 
     def minimize(self, node):
+        """Returns the minimized value and its state, recursive calls with maximize()"""
+
         if node.is_terminal:
             return [node.state, node.evaluation]
 

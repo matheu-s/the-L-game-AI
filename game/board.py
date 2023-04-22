@@ -1,4 +1,4 @@
-import pygame, time
+import pygame, time, os
 
 from config.constants import *
 from game.pieces.coin import Coin
@@ -77,18 +77,28 @@ class Board:
                 self.temp_squares = []
                 self.keys_L1_red = self.temp_keys
 
+        elif self.turn == 0:
+            print('Waiting player to click Back')
         else:
             data = self.generate_data()
             self.engine.update_squares(data)
+
             try:
-                new_board_state = self.engine.play()
+                new_board_state, score = self.engine.play()
             except GeneratorExit as e:
-                print('bot lost')
                 if e == 'LOSS':
-                    print('bot lost')
+                    print('Bot lost')
                 return False
             self.update_board(new_board_state, screen)
-            time.sleep(1)
+
+            if score == 10:
+                self.render_result(screen, 'WIN')
+                self.turn = 0
+                return
+            elif score == -10:
+                self.render_result(screen, 'LOSS')
+                self.turn = 0
+                return
             self.turn = self.human_player_is
 
     def get_key_clicked_square(self, pos):
@@ -225,3 +235,13 @@ class Board:
             start_y = 40
             col_y = 1
 
+    def render_result(self, screen, result):
+        if result == 'LOSS':
+            sentence = 'Congrats! You defeated the Lphant'
+        else:
+            sentence = "You lost... maybe next time :("
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets/fonts/menu.otf'))
+        font = pygame.font.Font(path, 36)
+        text = font.render(sentence, True, (0, 0, 0))
+        screen.blit(text, (975 - text.get_width() // 2, 200 - text.get_height() // 2))
+        pygame.display.update()
